@@ -20,8 +20,10 @@ const AddTodoModal = () => {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    dispatch(addTodo({ title: task, description }));
+    const id = `${Date.now().toString(36)}-${Math.random()
+      .toString(36)
+      .substr(2, 8)}`;
+    dispatch(addTodo({ id, title: task, description }));
   };
 
   return (
