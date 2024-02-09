@@ -1,30 +1,66 @@
 import { useAppDispatch } from "@/redux/hooks";
 import { Button } from "../ui/button";
 import { removeTodo, toggleCompleted } from "@/redux/features/todoSlice";
+import { useUpdateTodoMutation } from "@/redux/api/api";
 type TTodoCardProps = {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   isCompleted?: boolean;
+  priority: string;
 };
 
-const TodoCard = ({ title, description, id, isCompleted }: TTodoCardProps) => {
+const TodoCard = ({
+  title,
+
+  description,
+  _id,
+  isCompleted,
+  priority,
+}: TTodoCardProps) => {
   const dispatch = useAppDispatch();
 
-  const toggleState = (id: string) => {
-    dispatch(toggleCompleted(id));
+  const [updateTodo, { isLoading, isSuccess }] = useUpdateTodoMutation();
+
+  const toggleState = () => {
+    // dispatch(toggleCompleted(id));
+
+    const option = {
+      id: _id,
+      data: {
+        title,
+        description,
+        priority,
+        isCompleted: !isCompleted,
+      },
+    };
+
+    updateTodo(option);
   };
 
   return (
     <div className="bg-white rounded-md flex justify-between items-center p-3 border border-green-400">
       <input
-        onChange={() => toggleState(id)}
+        className="mr-3"
+        onChange={() => toggleState()}
         type="checkbox"
         name="complete"
         id="complete"
+        defaultChecked={isCompleted}
       />
-      <p className="font-semibold">{title}</p>
-      <div>
+      <p className="font-semibold flex-1">{title}</p>
+      <div className="flex-1 flex items-center gap-2">
+        <div
+          className={`size-3 rounded-full 
+        
+        ${priority === "high" ? "bg-red-500" : ""}
+        ${priority === "medium" ? "bg-yellow-500" : ""}
+        ${priority === "low" ? "bg-green-500" : ""}
+        `}
+        ></div>
+        <p className="flex-1">{priority} </p>
+      </div>
+      <div className="flex-1">
         {isCompleted ? (
           <p className="text-green-800">Done</p>
         ) : (
@@ -32,7 +68,7 @@ const TodoCard = ({ title, description, id, isCompleted }: TTodoCardProps) => {
         )}
       </div>
 
-      <p>{description}</p>
+      <p className="flex-[2]">{description}</p>
       <div className="space-x-5">
         <Button className="bg-red-500" onClick={() => dispatch(removeTodo(id))}>
           <svg

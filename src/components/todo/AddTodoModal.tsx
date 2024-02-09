@@ -11,19 +11,36 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { FormEvent, useState } from "react";
-import { useAppDispatch } from "@/redux/hooks";
-import { addTodo } from "@/redux/features/todoSlice";
+
+import { useAddTodoMutation } from "@/redux/api/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 const AddTodoModal = () => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
-  const dispatch = useAppDispatch();
+  const [priority, setPriority] = useState("");
+  // const dispatch = useAppDispatch();
 
+  const [addTodo, { data, isError, isLoading, isSuccess }] =
+    useAddTodoMutation();
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const id = `${Date.now().toString(36)}-${Math.random()
-      .toString(36)
-      .substr(2, 8)}`;
-    dispatch(addTodo({ id, title: task, description }));
+
+    // From local state
+    // dispatch(addTodo({ id, title: task, description }));
+
+    /* From server */
+    addTodo({
+      title: task,
+      description,
+      priority,
+      isCompleted: false,
+    });
   };
 
   return (
@@ -59,6 +76,19 @@ const AddTodoModal = () => {
                 id="description"
                 className="col-span-3"
               />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Priority</Label>
+              <Select onValueChange={(value: string) => setPriority(value)}>
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a Priority" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="low">Low</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex justify-end">
